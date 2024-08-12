@@ -1,10 +1,8 @@
 import streamlit as st
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
 import requests
 import re
 from collections import Counter
-from itertools import islice
 
 # Function to fetch and parse a webpage
 def fetch_page(url):
@@ -12,9 +10,9 @@ def fetch_page(url):
     return BeautifulSoup(response.text, 'html.parser')
 
 # Function to count words in a specific section of a webpage
-def count_words(soup, section=None):
-    if section:
-        elements = soup.select(section)
+def count_words(soup, selector=None):
+    if selector:
+        elements = soup.select(selector)
     else:
         elements = soup.find_all(text=True)
     
@@ -47,15 +45,22 @@ def count_phrases(words, n):
 # Function to display the analysis
 def display_analysis(url, categories, phrases):
     st.subheader(f'Analysis for {url}')
+    
     st.write('### Word Counts by Category:')
     for category, counts in categories.items():
         st.write(f'**{category}**: {sum(counts.values())} words')
-        st.write(counts.most_common(10))
+        if counts:
+            st.write(", ".join([f"{word}: {count}" for word, count in counts.most_common(10)]))
+        else:
+            st.write("No words found in this category.")
     
     st.write('### Phrase Counts:')
     for n, phrase_count in phrases.items():
         st.write(f'**{n}-word Phrases:**')
-        st.write(phrase_count.most_common(10))
+        if phrase_count:
+            st.write(", ".join([f"{phrase}: {count}" for phrase, count in phrase_count.most_common(10)]))
+        else:
+            st.write(f"No {n}-word phrases found.")
 
 # Main function to run the app
 def main():
