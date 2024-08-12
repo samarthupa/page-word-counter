@@ -13,6 +13,7 @@ def fetch_page(url):
 def count_words(soup, selector=None):
     if selector:
         elements = soup.select(selector)
+        st.write(f"Selector '{selector}' found {len(elements)} elements.")  # Debugging
     else:
         elements = soup.find_all(text=True)
     
@@ -28,10 +29,10 @@ def categorize_word_counts(soup):
     categories = {
         'Linked Words': count_words(soup, 'a'),
         'Unlinked Words': count_words(soup, ':not(a)'),
-        'Footer Linked Words': count_words(soup, 'footer a'),
-        'Footer Unlinked Words': count_words(soup, 'footer :not(a)'),
-        'Navigation Linked Words': count_words(soup, 'nav a'),
-        'Navigation Unlinked Words': count_words(soup, 'nav :not(a)'),
+        'Footer Linked Words': count_words(soup, 'footer a, .footer a'),
+        'Footer Unlinked Words': count_words(soup, 'footer :not(a), .footer :not(a)'),
+        'Navigation Linked Words': count_words(soup, 'nav a, .nav a'),
+        'Navigation Unlinked Words': count_words(soup, 'nav :not(a), .nav :not(a)'),
         'Body Words': count_words(soup, 'body'),
         'Body Unlinked Words': count_words(soup, 'body :not(a)'),
     }
