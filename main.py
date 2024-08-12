@@ -18,6 +18,9 @@ def count_words(soup, section=None):
     else:
         elements = soup.find_all(text=True)
     
+    # Filter out elements that are not strings
+    elements = [element for element in elements if isinstance(element, str)]
+    
     text = ' '.join([element.strip() for element in elements if element.strip()])
     words = re.findall(r'\b\w+\b', text.lower())
     return Counter(words)
@@ -63,11 +66,14 @@ def main():
     if st.button("Analyze"):
         for url in urls:
             if url:
-                soup = fetch_page(url)
-                categories = categorize_word_counts(soup)
-                words = re.findall(r'\b\w+\b', soup.get_text().lower())
-                phrases = {1: count_phrases(words, 1), 2: count_phrases(words, 2), 3: count_phrases(words, 3)}
-                display_analysis(url, categories, phrases)
+                try:
+                    soup = fetch_page(url)
+                    categories = categorize_word_counts(soup)
+                    words = re.findall(r'\b\w+\b', soup.get_text().lower())
+                    phrases = {1: count_phrases(words, 1), 2: count_phrases(words, 2), 3: count_phrases(words, 3)}
+                    display_analysis(url, categories, phrases)
+                except Exception as e:
+                    st.error(f"Error processing URL {url}: {str(e)}")
 
 if __name__ == "__main__":
     main()
