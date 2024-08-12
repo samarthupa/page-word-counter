@@ -9,7 +9,7 @@ def fetch_page(url):
     response = requests.get(url)
     return BeautifulSoup(response.text, 'html.parser')
 
-# Function to count words in a specific section of a webpage
+# Function to extract text and count words in specific elements
 def count_words(soup, selector=None):
     if selector:
         elements = soup.select(selector)
@@ -17,10 +17,8 @@ def count_words(soup, selector=None):
     else:
         elements = soup.find_all(text=True)
     
-    # Filter out elements that are not strings
-    elements = [element for element in elements if isinstance(element, str)]
-    
-    text = ' '.join([element.strip() for element in elements if element.strip()])
+    # Extract text from elements and join into a single string
+    text = ' '.join([element.get_text(separator=' ').strip() if hasattr(element, 'get_text') else element.strip() for element in elements if isinstance(element, str) or hasattr(element, 'get_text')])
     words = re.findall(r'\b\w+\b', text.lower())
     return Counter(words)
 
